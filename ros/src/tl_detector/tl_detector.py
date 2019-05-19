@@ -14,7 +14,7 @@ from scipy.spatial import KDTree
 import os
 
 STATE_COUNT_THRESHOLD = 3
-IMAGE_CHECK_FREQUENCY = 0.35 # in ms 
+IMAGE_CHECK_FREQUENCY = .5 # in ms 
 RECORD_DATA = False
 
 
