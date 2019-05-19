@@ -4,7 +4,7 @@ import rospy
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 from scipy.spatial import KDTree
-
+import numpy as np
 import math
 
 '''
@@ -37,13 +37,11 @@ class WaypointUpdater(object):
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
-        # TODO: Add other member variables you need below
         self.pose = None
         self.base_waypoints = None
         self.waypoints_2d = None
         self.waypoint_tree = None
 
-        rospy.spin()
         self.loop()
 
     def loop(self):
@@ -51,14 +49,14 @@ class WaypointUpdater(object):
         while not rospy.is_shutdown():
             if self.pose and self.base_waypoints:
                 # Get closes waypoint
-                cosest_waypoint = self.get_closest_waypoint_idx()
-                self.publish_waypoints(closest_waypoint_idx)
+                cosest_waypoint_idx = self.get_closest_waypoint_id()
+                self.publish_waypoints(cosest_waypoint_idx)
             rate.sleep()
     
     def get_closest_waypoint_id(self):
         x = self.pose.pose.position.x
         y = self.pose.pose.position.y
-        cosest_idx = self.waypoint_tree.query([x, y], 1)[1]
+        closest_idx = self.waypoint_tree.query([x, y], 1)[1]
         
         # CHECK IF CLOSEST IS ahead or behind vehicle
         closest_coord = self.waypoints_2d[closest_idx]
@@ -82,11 +80,9 @@ class WaypointUpdater(object):
         
     
     def pose_cb(self, msg):
-        # TODO: Implement
         self.pose = msg
 
     def waypoints_cb(self, waypoints):
-        # TODO: Implement
         self.base_waypoints = waypoints
         if not self.waypoints_2d:
             self.waypoints_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
